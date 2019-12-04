@@ -2,9 +2,11 @@
 
 from functools import reduce
 
-from PIL import Image
-import numpy as np
 from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
+import numpy as np
+from PIL import Image
+
+# TODO replace PIL with cv2
 
 def compose(*funcs):
     """Compose arbitrarily many functions, evaluated left to right.
@@ -26,6 +28,7 @@ def letterbox_image(image, size):
     nh = int(ih*scale)
 
     image = image.resize((nw,nh), Image.BICUBIC)
+
     new_image = Image.new('RGB', size, (128,128,128))
     new_image.paste(image, ((w-nw)//2, (h-nh)//2))
     return new_image
@@ -51,6 +54,7 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         image_data=0
         if proc_img:
             image = image.resize((nw,nh), Image.BICUBIC)
+
             new_image = Image.new('RGB', (w,h), (128,128,128))
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image)/255.
