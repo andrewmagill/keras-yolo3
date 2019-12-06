@@ -17,7 +17,7 @@ MODEL_DATA = "model_data"
 OUT_FILENAME = "train.txt"
 
 # limit the number of images per class
-LIMIT = 20 # 500
+LIMIT = 50 # 500
 
 ANNOTATIONS_BASEPATH_TRAIN = os.path.join(ROOT, ILSVRC, ANNOTATIONS, TRAIN)
 ANNOTATIONS_BASEPATH_VAL = os.path.join(ROOT, ILSVRC, ANNOTATIONS, VAL)
