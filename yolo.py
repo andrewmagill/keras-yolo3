@@ -3,6 +3,9 @@
 Class definition of YOLO_v3 style detection model on image and video
 """
 
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
 import colorsys
 import os
 from timeit import default_timer as timer
@@ -18,11 +21,25 @@ from yolo3.utils import letterbox_image
 import os
 from keras.utils import multi_gpu_model
 
+### half precision
+import tensorflow as tf
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+tf.keras.backend.set_session(tf.Session(config=config))
+###
+
+### cudnn version conflict workaround
+import tensorflow as tf
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+tf.keras.backend.set_session(tf.Session(config=config))
+###
+
 class YOLO(object):
     _defaults = {
-        "model_path": 'model_data/yolo.h5',
+        "model_path": "logs/013/ep003-loss19.867-val_loss20.086.h5", # "model_data/trained_weights_stage_1.h5",
         "anchors_path": 'model_data/yolo_anchors.txt',
-        "classes_path": 'model_data/coco_classes.txt',
+        "classes_path": 'model_data/voc_classes.txt',
         "score" : 0.3,
         "iou" : 0.45,
         "model_image_size" : (416, 416),
@@ -130,6 +147,8 @@ class YOLO(object):
                     size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
         thickness = (image.size[0] + image.size[1]) // 300
 
+        results = []
+
         for i, c in reversed(list(enumerate(out_classes))):
             predicted_class = self.class_names[c]
             box = out_boxes[i]
@@ -162,9 +181,14 @@ class YOLO(object):
             draw.text(text_origin, label, fill=(0, 0, 0), font=font)
             del draw
 
+            results.append("%s %s %s %s %s" % (label, bottom, left, top, right))
+
         end = timer()
         print(end - start)
-        return image
+
+        results = [image]+results
+
+        return results
 
     def close_session(self):
         self.sess.close()
